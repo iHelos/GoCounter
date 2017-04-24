@@ -7,6 +7,7 @@ import (
 	"github.com/iHelos/GoCounter/pool"
 	"github.com/iHelos/GoCounter/task"
 	"os"
+	"regexp"
 )
 
 func main() {
@@ -22,13 +23,18 @@ func main() {
 
 	url_count := 0
 
+	rp, err := regexp.Compile("go")
+	if(err != nil) {
+		fmt.Printf("Bad regexp\n%s", err.Error())
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if p.GetSize() < *k {
 			p.Resize(p.GetSize() + 1)
 		}
-		p.SendTask(&task.Task{line, &results})
+		p.SendTask(&task.Task{line, &results, rp})
 		url_count++
 	}
 
