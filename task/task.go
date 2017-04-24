@@ -32,6 +32,6 @@ func (t *Task) Execute() {
 }
 
 func (t *Task) ProcessError(err error) {
-	fmt.Printf("Error for %s: %s", t.Url, err.Error())
+	fmt.Printf("Error for %s: %s\n", t.Url, err.Error())
 	*(t.Result) <- 0
 }

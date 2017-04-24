@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/iHelos/GoCounter/pool"
 	"github.com/iHelos/GoCounter/task"
+	"github.com/iHelos/GoCounter/result"
 	"os"
 	"regexp"
 )
@@ -20,8 +21,8 @@ func main() {
 	defer p.Close()
 
 	results := make(chan int, *b)
-
-	url_count := 0
+	result_waiter := result.MakeResultWaiter(&results)
+	defer result_waiter.Close()
 
 	rp, err := regexp.Compile("Go")
 	if err != nil {
@@ -35,12 +36,7 @@ func main() {
 			p.Resize(p.GetSize() + 1)
 		}
 		p.SendTask(&task.Task{line, &results, rp})
-		url_count++
+		result_waiter.WaitForUrl()
 	}
-
-	sum := 0
-	for i := 0; i < url_count; i++ {
-		sum += <-results
-	}
-	fmt.Printf("Total: %d\n", sum)
+	fmt.Printf("Total: %d\n", result_waiter.GetResult())
 }
