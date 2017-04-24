@@ -12,7 +12,9 @@ import (
 )
 
 func main() {
+	//Максимальное количество горутин-воркеров
 	k := flag.Int("k", 5, "max goroutines count")
+	//Максимальный размер буфера тасков
 	b := flag.Int("b", 128, "max buffer tasks")
 
 	flag.Parse()
@@ -32,8 +34,9 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if p.GetSize() < *k {
-			p.Resize(p.GetSize() + 1)
+		size := p.GetSize()
+		if size < *k {
+			p.Resize(size + 1)
 		}
 		p.SendTask(&task.Task{line, &results, rp})
 		result_waiter.WaitForUrl()

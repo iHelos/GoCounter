@@ -4,6 +4,12 @@ import (
 	"sync"
 )
 
+//Пул заданий
+//m - мьютек для ресайза
+//wg - группа, учитывающая все процессы
+//stop - канал, который слушают Воркеры, чтобы самоубиться
+//task - канал, который слушают Воркеры, чтобы выполнить задание
+//worker_count - количество сущестующих Воркеров
 type pool struct {
 	m  sync.Mutex
 	wg sync.WaitGroup
@@ -14,6 +20,9 @@ type pool struct {
 	worker_count int
 }
 
+//Создание нового пула
+//size - исходный размер
+//buf_size - размер буфера канала заданий
 func NewPool(size int, buf_size int) *pool {
 	p := &pool{
 		stop: make(chan struct{}),
@@ -23,10 +32,12 @@ func NewPool(size int, buf_size int) *pool {
 	return p
 }
 
+//Получение текущего размера пула
 func (p *pool) GetSize() int {
 	return p.worker_count
 }
 
+//Изменение размера пула (добавление или уничтожение Воркеров)
 func (p *pool) Resize(new_size int) {
 	p.m.Lock()
 	defer p.m.Unlock()
@@ -41,6 +52,7 @@ func (p *pool) Resize(new_size int) {
 	}
 }
 
+//Жизненный цикл Воркера
 func (p *pool) worker() {
 	defer p.wg.Done()
 	for {
@@ -57,14 +69,12 @@ func (p *pool) worker() {
 	}
 }
 
+//Отправить задание в пул
 func (p *pool) SendTask(task Task) {
 	p.task <- task
 }
 
+//Закрыть пул Воркеров
 func (p *pool) Close() {
 	close(p.task)
-}
-
-func (p *pool) Wait() {
-	p.wg.Wait()
 }
