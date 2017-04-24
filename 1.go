@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/iHelos/GoCounter/pool"
-	"github.com/iHelos/GoCounter/task"
 	"github.com/iHelos/GoCounter/result"
+	"github.com/iHelos/GoCounter/task"
 	"os"
 	"regexp"
 )
