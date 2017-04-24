@@ -16,15 +16,15 @@ func main() {
 
 	flag.Parse()
 
-	p := pool.NewPool(1, *b)
+	p := pool.NewPool(0, *b)
 	defer p.Close()
 
 	results := make(chan int, *b)
 
 	url_count := 0
 
-	rp, err := regexp.Compile("go")
-	if(err != nil) {
+	rp, err := regexp.Compile("Go")
+	if err != nil {
 		fmt.Printf("Bad regexp\n%s", err.Error())
 	}
 
