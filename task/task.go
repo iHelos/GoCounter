@@ -2,15 +2,15 @@ package task
 
 import (
 	"fmt"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 	"regexp"
 )
 
 type Task struct {
-	Url    string
-	Result *chan int
-	RegRule     *regexp.Regexp
+	Url     string
+	Result  *chan int
+	RegRule *regexp.Regexp
 }
 
 func (t *Task) Execute() {
