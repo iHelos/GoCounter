@@ -2,6 +2,7 @@ package pool
 
 import (
 	"sync"
+	//"fmt"
 )
 
 //Пул заданий
@@ -16,6 +17,8 @@ type pool struct {
 
 	stop chan struct{}
 	task chan Task
+
+	processing_tasks count
 
 	worker_count int
 }
@@ -54,6 +57,7 @@ func (p *pool) Resize(new_size int) {
 
 //Жизненный цикл Воркера
 func (p *pool) worker() {
+	//fmt.Println("Worker created")
 	defer p.wg.Done()
 	for {
 		select {
@@ -63,6 +67,7 @@ func (p *pool) worker() {
 			}
 			//fmt.Println("executing")
 			new_task.Execute()
+			p.processing_tasks.Done()
 		case <-p.stop:
 			return
 		}
@@ -71,10 +76,15 @@ func (p *pool) worker() {
 
 //Отправить задание в пул
 func (p *pool) SendTask(task Task) {
+	p.processing_tasks.Add()
 	p.task <- task
 }
 
 //Закрыть пул Воркеров
 func (p *pool) Close() {
 	close(p.task)
+}
+
+func (p *pool) QueueSize() int {
+	return p.processing_tasks.Get() - p.worker_count
 }

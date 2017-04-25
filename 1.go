@@ -3,15 +3,21 @@ package main
 import (
 	"bufio"
 	"flag"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
+	"os"
+	"regexp"
 	"fmt"
 	"github.com/iHelos/GoCounter/pool"
 	"github.com/iHelos/GoCounter/result"
 	"github.com/iHelos/GoCounter/task"
-	"os"
-	"regexp"
 )
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	//Максимальное количество горутин-воркеров
 	k := flag.Int("k", 5, "max goroutines count")
 	//Максимальный размер буфера тасков
@@ -35,7 +41,9 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 		size := p.GetSize()
-		if size < *k {
+		qsize := p.QueueSize()
+		//fmt.Println(qsize)
+		if qsize == 0 && size < *k {
 			p.Resize(size + 1)
 		}
 		p.SendTask(&task.Task{line, &results, rp})
