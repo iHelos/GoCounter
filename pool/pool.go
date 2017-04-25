@@ -85,6 +85,6 @@ func (p *pool) Close() {
 	close(p.task)
 }
 
-func (p *pool) QueueSize() int {
-	return p.processing_tasks.Get() - p.worker_count
+func (p *pool) HaveFreeWorker() bool {
+	return p.processing_tasks.Get() < p.worker_count
 }

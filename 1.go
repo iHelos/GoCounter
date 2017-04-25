@@ -41,9 +41,7 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 		size := p.GetSize()
-		qsize := p.QueueSize()
-		//fmt.Println(qsize)
-		if qsize == 0 && size < *k {
+		if !p.HaveFreeWorker() && size < *k {
 			p.Resize(size + 1)
 		}
 		p.SendTask(&task.Task{line, &results, rp})
